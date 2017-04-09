@@ -35,7 +35,20 @@ green olay button at top center to run app
 create new emulator -> phone -> nexus s -> next -> system image - nougat Android 7.1.1 -> next
 
 drag TextView element from Pallete-> Widgets to devices screen, put where needed, change text and
-id in properties window, open all propertiesm change margin to 20dp(not px, dp prefered because âo not rely on screen resolution)(sp - scale independed pixel, same as dp, but rely on user zoom options)
+id in properties window, open all propertiesm change margin to 20dp(not px, dp prefered because âo not rely on screen resolution)(sp - scale independed pixel, same as dp, but affected by user zoom level)
 use lighting near play to insta run changed build
+
+add button
+find onClick in properties -> type clickFunction
+
+create clickFunction in MainActivity class
+
+public void clickFunction(View view){
+        System.out.println("Clicked");
+        Log.i("Info", "Button pressed");
+    }
+
+run app with lightning, click button
+see System.out and Log info in Android Monitor
 
 
