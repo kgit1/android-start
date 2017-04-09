@@ -51,4 +51,45 @@ public void clickFunction(View view){
 run app with lightning, click button
 see System.out and Log info in Android Monitor
 
+add PlainText(text field)
+empty name
+change hint to "Enter your name"
+
+change clickFunction to handle text field
+create object EditText and assign value from field which we acces by method
+findViewById(R.id.myTextField) - R - for resources, id - for elemement id
+
+ public void clickFunction(View view){
+        EditText stringEnterName = (EditText) findViewById(R.id.myTextField);
+        EditText stringEnterPassword = (EditText) findViewById(R.id.myPasswordField);
+        System.out.println("Clicked");
+        Log.i("Info", "Button pressed");
+        Log.i("Name", stringEnterName.getText().toString());
+        Log.i("Password",stringEnterPassword.getText().toString());
+    }
+
+add Toast - quick pop-up window
+	Toast.makeText(MainActivity.this, "Login: "+stringEnterName.getText().toString(),
+        Toast.LENGTH_SHORT).show();
+and in method
+public void clickFunction(View view){
+        EditText stringEnterName = (EditText) findViewById(R.id.myTextField);
+        EditText stringEnterPassword = (EditText) findViewById(R.id.myPasswordField);
+
+        Toast.makeText(MainActivity.this, "Login: "+stringEnterName.getText().toString(),
+                Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(MainActivity.this, "Password: "+stringEnterPassword.getText().toString(),
+                Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(MainActivity.this, "Hi there, Queen of Meereen, Queen of the Andals" +
+                "(, the Rhoynar) and the First Men, Lady Regnant of the Seven Kingdoms, Khaleesi"+
+                "of the Great Grass Sea, Mhysa, Breaker of Chains, the Unburnt, Mother of Dragons",
+                Toast.LENGTH_LONG).show();        
+
+        System.out.println("Clicked");
+        Log.i("Info", "Button pressed");
+        Log.i("Name", stringEnterName.getText().toString());
+        Log.i("Password",stringEnterPassword.getText().toString());
+    }
 

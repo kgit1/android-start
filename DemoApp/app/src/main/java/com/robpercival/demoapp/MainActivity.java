@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
                 "(, the Rhoynar) and the First Men, Lady Regnant of the Seven Kingdoms, Khaleesi"+
                 "of the Great Grass Sea, Mhysa, Breaker of Chains, the Unburnt, Mother of Dragons",
                 Toast.LENGTH_LONG).show();
-        
 
         System.out.println("Clicked");
         Log.i("Info", "Button pressed");
