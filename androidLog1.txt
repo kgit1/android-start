@@ -1,0 +1,33 @@
+download android studio -> instal -> run
+
+start new Android Studio project
+
+app name : Demo App
+company domain: a.example.com
+project location: D:\J\android\android-start\DemoApp
+next
+phone and tablet -> minimum sdk -> Api 15: Android 4.0.3
+next -> next -> empty activity -> next -> 
+activity name MainActivity + layout name activity_main -> finish
+
+minifests folder
+android manifest xml contains basic info about app icon , label, app name, theme, etc
+
+resources folder
+hold icons, images, music etc what we for app need
+
+java folder 
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+
+//appCompatActivity makes sure that app compatable with as many old android versions as needed
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
+
+resources -> layout -> activity_mail.xml - double click -> view on app
