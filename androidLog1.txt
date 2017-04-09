@@ -31,3 +31,11 @@ public class MainActivity extends AppCompatActivity {
 }
 
 resources -> layout -> activity_mail.xml - double click -> view on app
+green olay button at top center to run app
+create new emulator -> phone -> nexus s -> next -> system image - nougat Android 7.1.1 -> next
+
+drag TextView element from Pallete-> Widgets to devices screen, put where needed, change text and
+id in properties window, open all propertiesm change margin to 20dp(not px, dp prefered because âo not rely on screen resolution)(sp - scale independed pixel, same as dp, but rely on user zoom options)
+use lighting near play to insta run changed build
+
+
