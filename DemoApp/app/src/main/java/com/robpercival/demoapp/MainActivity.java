@@ -1,9 +1,11 @@
 package com.robpercival.demoapp;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -11,43 +13,56 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     boolean imageClicked = false;
+    boolean imageScaled = false;
+    ImageView image2;
 
     //method for tosters - small pop-ups
     //takes values from textFields
     //invokes pop-ups with values from text fields added
-    public void clickFunction(View view){
+    public void clickFunction(View view) {
         EditText stringEnterName = (EditText) findViewById(R.id.myTextField);
         EditText stringEnterPassword = (EditText) findViewById(R.id.myPasswordField);
 
-        Toast.makeText(MainActivity.this, "Login: "+stringEnterName.getText().toString(),
+        Toast.makeText(MainActivity.this, "Login: " + stringEnterName.getText().toString(),
                 Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(MainActivity.this, "Password: "+stringEnterPassword.getText().toString(),
+        Toast.makeText(MainActivity.this, "Password: " + stringEnterPassword.getText().toString(),
                 Toast.LENGTH_SHORT).show();
 
         Toast.makeText(MainActivity.this, "Hi there, Queen of Meereen, Queen of the Andals" +
-                "(, the Rhoynar) and the First Men, Lady Regnant of the Seven Kingdoms, Khaleesi"+
-                "of the Great Grass Sea, Mhysa, Breaker of Chains, the Unburnt, Mother of Dragons",
+                        "(, the Rhoynar) and the First Men, Lady Regnant of the Seven Kingdoms, Khaleesi" +
+                        "of the Great Grass Sea, Mhysa, Breaker of Chains, the Unburnt, Mother of Dragons",
                 Toast.LENGTH_LONG).show();
 
         System.out.println("Clicked");
         Log.i("Info", "Button pressed");
         Log.i("Name", stringEnterName.getText().toString());
-        Log.i("Password",stringEnterPassword.getText().toString());
+        Log.i("Password", stringEnterPassword.getText().toString());
     }
 
     //method for changing image element source (update image with android code)
-    public void clickFunctionChangeImage(View view){
-        Log.i("Test","Button clicked");
-       ImageView image2 = (ImageView) findViewById(R.id.catOrNot);
-        if(!imageClicked){
-        image2.setImageResource(R.drawable.dogy);
-        imageClicked=true;
-        }else{
+    public void clickFunctionChangeImage(View view) {
+        Log.i("Test", "Button image clicked");
+        ImageView image2 = (ImageView) findViewById(R.id.catOrNot);
+        if (!imageClicked) {
+            image2.setImageResource(R.drawable.dogy);
+            imageClicked = true;
+        } else {
             image2.setImageResource(R.drawable.cat1);
-            imageClicked=false;
+            imageClicked = false;
         }
+    }
 
+    public void clickFunctionChangeScale(View view) {
+        Log.i("Test", "Button scale clicked");
+        ImageView image2 = (ImageView) findViewById(R.id.catOrNot);
+        if (!imageScaled) {
+            image2.setScaleType(ImageView.ScaleType.CENTER);
+            imageScaled = true;
+        } else {
+            image2.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            imageScaled = false;
+        }
     }
 
     @Override
@@ -61,23 +76,41 @@ public class MainActivity extends AppCompatActivity {
     //change app:srcCompat="@android:drawable/ic_dialog_email" for
     //android:src="@android:drawable/ic_dialog_email"
 
-   // findViewById(R.id.button).setOnClickListener(new OnClickListener() {
-     //   @Override
-      //  public void onClick(View v) {
-      //      final ImageView imageView = (ImageView) findViewById(R.id.image_view);
-     //       imageView.setImageResource(R.drawable.some_drawable);
-     //   }
+    // findViewById(R.id.button).setOnClickListener(new OnClickListener() {
+    //   @Override
+    //  public void onClick(View v) {
+    //      final ImageView imageView = (ImageView) findViewById(R.id.image_view);
+    //       imageView.setImageResource(R.drawable.some_drawable);
+    //   }
     //}
 
 
+    // btn.setOnClickListener(new OnClickListener() {
 
-
-   // btn.setOnClickListener(new OnClickListener() {
-
-       // @Override
-       // public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-         //   btn.setBackgroundDrawable(getResources().getDrawable(R.drawable.locationbutton_on));
-       // }
+    // @Override
+    // public void onClick(View arg0) {
+    // TODO Auto-generated method stub
+    //   btn.setBackgroundDrawable(getResources().getDrawable(R.drawable.locationbutton_on));
+    // }
     //});
+
+
+    // ImageButton button;
+
+    // @Override
+    // public void onCreate(Bundle savedInstanceState) {
+    //     super.onCreate(savedInstanceState);
+    //     setContentView(R.layout.activity_main);
+
+    //     button= (ImageButton)findViewById(R.id.imgButton);
+    //     button.setOnClickListener(imgButtonHandler);
+    // }
+
+
+    // View.OnClickListener imgButtonHandler = new View.OnClickListener() {
+
+    //    public void onClick(View v) {
+    //        button.setBackgroundResource(R.drawable.ic_launcher);
+    //    }
+    // };
 }
