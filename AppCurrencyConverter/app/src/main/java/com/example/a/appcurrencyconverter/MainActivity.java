@@ -31,11 +31,16 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Log.i("Test"," converter listener");
             if(!TextUtils.isEmpty(number.getText())){
-            answer.setText((Double.parseDouble(number.getText().toString())/27)+"");
+            answer.setText(number.getText().toString()+"val = "+
+                    roundTo2DecimalPlaces((Double.parseDouble(number.getText().toString())/27))+
+                            "$");
             }else {
             answer.setText("Enter value to convert");
             }
         }
     }
 
+    private String roundTo2DecimalPlaces(double value){
+        return String.format("%.2f",value);
+    }
 }
