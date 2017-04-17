@@ -17,20 +17,28 @@ public class MainActivity extends AppCompatActivity {
         int guess = Integer.parseInt(textEnter.getText().toString());
         if (guess == rand) {
             Log.i("Test", "button check clicked");
-            textResult.setText("Congratulations!!!\n" + guess + " = " + rand + " mine number\nTry more!");
+            //textResult.setText("Congratulations!!!\n" + guess + " = " + rand + " mine number\nTry more!");
+            textResultSet("Congratulations!!!\n" + guess + " = " + rand + " mine number\nTry more!");
             textEnter.setText(null);
-            rand = (int) (Math.random() * 20);
+            rand = (int) (Math.random() * 20 + 1);
         } else {
             if (guess > rand) {
                 Log.i("Test", guess + " > " + rand);
-                textResult.setText("Fail! " + guess + " Higher \nTry more!");
+                //textResult.setText("Fail! " + guess + " Higher \nTry more!");
+                textResultSet("Fail! " + guess + " Higher \nTry more!");
                 textEnter.setText(null);
             } else {
                 Log.i("Test", guess + " < " + rand);
-                textResult.setText("Fail! " + guess + " Lower \nTry more!");
+                // textResult.setText("Fail! " + guess + " Lower \nTry more!");
+                textResultSet("Fail! " + guess + " Lower \nTry more!");
                 textEnter.setText(null);
             }
         }
+    }
+
+    public void textResultSet(String result) {
+        TextView textResult = (TextView) findViewById(R.id.textResult);
+        textResult.setText(result);
     }
 
     @Override
@@ -38,9 +46,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rand = (int) (Math.random() * 20);
-        System.out.println(rand);
-        System.out.println(Math.random() * 20);
-        System.out.println(Math.random());
+        rand = (int) (Math.random() * 20 + 1);
     }
 }
