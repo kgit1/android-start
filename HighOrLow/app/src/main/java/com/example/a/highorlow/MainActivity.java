@@ -17,23 +17,20 @@ public class MainActivity extends AppCompatActivity {
         int guess = Integer.parseInt(textEnter.getText().toString());
         if (guess == rand) {
             Log.i("Test", "button check clicked");
-            textResult.setText("Congratulations!!!\n your guess number " + guess + " = " + rand + " mine number\nTry more!");
+            textResult.setText("Congratulations!!!\n" + guess + " = " + rand + " mine number\nTry more!");
             textEnter.setText(null);
             rand = (int) (Math.random() * 20);
         } else {
             if (guess > rand) {
                 Log.i("Test", guess + " > " + rand);
-                textResult.setText("Fail!\n your guess number " + guess + " > " + rand + " mine number\nTry more!");
+                textResult.setText("Fail! " + guess + " Higher \nTry more!");
                 textEnter.setText(null);
-                rand = (int) (Math.random() * 20);
             } else {
                 Log.i("Test", guess + " < " + rand);
-                textResult.setText("Fail!\n your guess number " + guess + " < " + rand + " mine number\nTry more!");
+                textResult.setText("Fail! " + guess + " Lower \nTry more!");
                 textEnter.setText(null);
-                rand = (int) (Math.random() * 20);
             }
         }
-
     }
 
     @Override
