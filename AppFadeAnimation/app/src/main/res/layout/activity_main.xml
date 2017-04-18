@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.a.appfadeanimation.MainActivity">
+
+    <ImageView
+        android:id="@+id/imageBart"
+        android:layout_width="356dp"
+        android:layout_height="491dp"
+        android:layout_marginLeft="-17dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:onClick="functionFade"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bart1" />
+
+    <ImageView
+        android:id="@+id/imageBart2"
+        android:layout_width="354dp"
+        android:layout_height="494dp"
+        android:alpha="0"
+        app:srcCompat="@drawable/bart2"
+        tools:layout_editor_absoluteX="17dp"
+        tools:layout_editor_absoluteY="8dp" />
+</android.support.constraint.ConstraintLayout>
