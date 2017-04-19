@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     boolean gameWon = false;
     //true = first player active, false = second
     boolean activePlayer1 = true;
-    //2 - means unplayed field, 1 - mean yellow, 0 - mean red
+    //2 - means unplayed field, 1 - means yellow, 0 - means red
     int[] gameArray = {2, 2, 2, 2, 2, 2, 2, 2, 2};
     //add android:tag="name" to images to differ them by getTag() method
 
@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean winningState() {
+        int comboCounter = 8;
         int[][] winningCombs = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}};
         for (int[] winningComb : winningCombs) {
 
@@ -65,10 +66,16 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Yellow WINS!", Toast.LENGTH_SHORT).show();
                     }
                     return true;
+                } else if (gameArray[winningComb[1]] != 2 && gameArray[winningComb[2]] != 2) {
+                    comboCounter--;
+                    if (comboCounter == 0) {
+                        Toast.makeText(MainActivity.this, "DRAW!", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
                 }
             }
-
         }
+        comboCounter = 8;
         return false;
     }
 
