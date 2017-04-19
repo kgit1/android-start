@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         if (pause) {
             mediaPlayer.start();
         } else if (!started) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.judas_priest__painkiller);
+            mediaPlayer = MediaPlayer.create(this, R.raw.laugh);
             mediaPlayer.start();
             started = true;
         }
