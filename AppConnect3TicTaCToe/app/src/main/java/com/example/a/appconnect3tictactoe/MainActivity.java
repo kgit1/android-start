@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     /*public boolean winningState() {
         boolean winningState = false;
         if (gameArray[0] != 2) {
@@ -124,6 +124,21 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Test", "winning state test false");
         return false;
     }*/
+
+    public void functionButtonNext(View view) {
+        gameWon = false;
+        activePlayer1 = true;
+
+        for (int i = 0; i < gameArray.length; i++) {
+            gameArray[i] = 2;
+        }
+        //ImageView image1=(ImageView) findViewById(R.id.imageView1);
+        //image1.setImageResource(none);
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.gridLayout);
+        for (int i = 0; i < gridLayout.getChildCount(); i++) {
+            ((ImageView) gridLayout.getChildAt(i)).setImageResource(0);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

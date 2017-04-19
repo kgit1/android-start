@@ -8,13 +8,16 @@
 
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonNext"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="4dp"
         android:layout_marginRight="26dp"
+        android:elevation="0dp"
+        android:onClick="functionButtonNext"
+        android:text="Next Game"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
     <GridLayout
