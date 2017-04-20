@@ -7,7 +7,12 @@ import android.os.Bundle;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     //soundbible.com - to download various sound files
@@ -17,8 +22,18 @@ public class MainActivity extends AppCompatActivity {
 
     //audio manager object - to interact with android aurio system to change volume
     AudioManager audioManager;
+    AudioManager audioManagerFile;
     boolean started = false;
     boolean pause = false;
+
+    TextView textVolume;
+    TextView textProgress;
+    String volume;
+    String progress;
+    int mediaLength;
+    int currentLength;
+
+    Button buttonRepeat;
 
     public void functionPlayButton(View view) {
         if (pause) {
@@ -42,7 +57,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void functionStopButton(View view) {
         mediaPlayer.stop();
+        //When you are done with it, you should always call release() to make sure any system
+        // resources allocated to it are properly released.
+        //As you may know, when the user changes the screen orientation (or changes the device
+        // configuration in another way), the system handles that by restarting the activity
+        // (by default), so you might quickly consume all of the system resources as the user
+        // rotates the device back and forth
+        mediaPlayer.release();
+        mediaPlayer = null;
+
         started = false;
+    }
+
+    public void functionRepeatButton(View view) {
+        if (mediaPlayer.isLooping()) {
+            Log.i("Test", "isnt looping");
+            mediaPlayer.setLooping(false);
+            buttonRepeat.setActivated(true);
+        } else {
+            Log.i("Test", "is looping");
+            mediaPlayer.setLooping(true);
+            buttonRepeat.setActivated(false);
+        }
     }
 
 
@@ -51,6 +87,63 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mediaPlayer = MediaPlayer.create(this, R.raw.laugh);
+
+        textVolume = (TextView) findViewById(R.id.textVolume);
+        textProgress = (TextView) findViewById(R.id.textProgress);
+
+        buttonRepeat = (Button) findViewById(R.id.buttonRepeat);
+
+        ////////AUDIO FILE CONTROL///////////////////////////
+        //get media file duration
+        mediaLength = mediaPlayer.getDuration();
+        progress = "";
+        progress = "Progress: " + 0.00 + " - " + mediaLength;
+        textProgress.setText(progress);
+
+
+        final SeekBar fileControl = (SeekBar) findViewById(R.id.seekBarAudioLength);
+        fileControl.setMax(mediaLength);
+
+        //create timer object to complete task on timer tik
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                //get current position of the file playback
+                                                //currentLength = mediaPlayer.getCurrentPosition();
+                                                fileControl.setProgress(mediaPlayer.getCurrentPosition());
+                                                //progress="";
+                                                //progress="Progress: "+currentLength+" - " + mediaLength;
+                                            }
+                                        }
+                //every second
+                , 0, 10);
+
+        fileControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.i("Test", "fileBar changed");
+                Log.i("Test", Integer.toString(progress));
+                if (fromUser) {
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        /////////////////////////////////////////////////////
+
+
+        ////////VOLUME CONTROL///////////////////////////////
         //get system audio volume level
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         //create max volume value - by getting it from system audio manager music stream
@@ -71,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.i("Test", "progressBar changed");
+                Log.i("Test", "volumeBar changed");
                 Log.i("Test", Integer.toString(progress));
 
                 //set volume value from seek bar to audio manager
@@ -91,5 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        //////////////////////////////////////////////////////
     }
+
 }
