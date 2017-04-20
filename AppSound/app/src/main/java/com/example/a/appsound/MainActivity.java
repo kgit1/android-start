@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     boolean started = false;
     boolean pause = false;
 
+    SeekBar fileControl;
+
     TextView textVolume;
     TextView textProgress;
     String volume;
@@ -33,14 +36,19 @@ public class MainActivity extends AppCompatActivity {
     int mediaLength;
     int currentLength;
 
+    Button buttonPlay;
+    Button buttonPause;
     Button buttonRepeat;
 
-    public void functionPlayButton(View view) {
-        if (pause) {
+
+    public void functionPlayButton(View view) throws IOException {
+        if (!mediaPlayer.isPlaying() && started) {
             mediaPlayer.start();
+            buttonPause.setEnabled(true);
         } else if (!started) {
             mediaPlayer = MediaPlayer.create(this, R.raw.laugh);
             mediaPlayer.start();
+            buttonPause.setEnabled(true);
             started = true;
         }
     }
@@ -48,23 +56,28 @@ public class MainActivity extends AppCompatActivity {
     public void functionPauseButton(View view) {
         if (pause) {
             mediaPlayer.start();
+            buttonPlay.setEnabled(true);
             pause = false;
         } else {
             mediaPlayer.pause();
+            buttonPlay.setEnabled(false);
             pause = true;
         }
     }
 
     public void functionStopButton(View view) {
         mediaPlayer.stop();
+        buttonPlay.setEnabled(true);
+        buttonPause.setEnabled(false);
+        fileControl.setProgress(1);
         //When you are done with it, you should always call release() to make sure any system
         // resources allocated to it are properly released.
         //As you may know, when the user changes the screen orientation (or changes the device
         // configuration in another way), the system handles that by restarting the activity
         // (by default), so you might quickly consume all of the system resources as the user
         // rotates the device back and forth
-        mediaPlayer.release();
-        mediaPlayer = null;
+        // mediaPlayer.release();
+        //mediaPlayer = null;
 
         started = false;
     }
@@ -92,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
         textVolume = (TextView) findViewById(R.id.textVolume);
         textProgress = (TextView) findViewById(R.id.textProgress);
 
+        buttonPlay = (Button) findViewById(R.id.buttonStart);
+        buttonPause = (Button) findViewById(R.id.buttonPause);
+        buttonPause.setEnabled(false);
         buttonRepeat = (Button) findViewById(R.id.buttonRepeat);
 
         ////////AUDIO FILE CONTROL///////////////////////////
@@ -102,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         textProgress.setText(progress);
 
 
-        final SeekBar fileControl = (SeekBar) findViewById(R.id.seekBarAudioLength);
+        fileControl = (SeekBar) findViewById(R.id.seekBarAudioLength);
         fileControl.setMax(mediaLength);
 
         //create timer object to complete task on timer tik
@@ -111,13 +127,15 @@ public class MainActivity extends AppCompatActivity {
                                             public void run() {
                                                 //get current position of the file playback
                                                 //currentLength = mediaPlayer.getCurrentPosition();
-                                                fileControl.setProgress(mediaPlayer.getCurrentPosition());
+                                                if (mediaPlayer.isPlaying()) {
+                                                    fileControl.setProgress(mediaPlayer.getCurrentPosition());
+                                                }
                                                 //progress="";
                                                 //progress="Progress: "+currentLength+" - " + mediaLength;
                                             }
                                         }
                 //every second
-                , 0, 10);
+                , 0, 80);
 
         fileControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -131,12 +149,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.pause();
 
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                mediaPlayer.start();
             }
         });
 
@@ -185,6 +204,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //////////////////////////////////////////////////////
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                buttonPause.setEnabled(false);
+            }
+        });
     }
 
 }
