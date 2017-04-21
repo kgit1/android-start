@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.stop();
         }
 
-        switch(button.getText().toString()){
+        switch(button.getTag().toString()){
             case "1":
                 mediaPlayer=MediaPlayer.create(this,R.raw.doyouspeakenglish);
                 mediaPlayer.start();
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onCompletion(MediaPlayer mp) {
                                                     mediaPlayer.stop();
+                                                    mediaPlayer.reset();
                                                     mediaPlayer.release();
                                                     mediaPlayer = null;
                                                     Log.i("Test","mediaplayer nulled");
