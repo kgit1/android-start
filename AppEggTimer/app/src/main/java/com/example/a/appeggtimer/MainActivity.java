@@ -89,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
             isPaused = false;
             isCanceled = false;
 
-            countDown = new CountDownTimer(count * 1000, 1000) {
+            //+100 to fix light lag on start end
+            countDown = new CountDownTimer(count * 1000+100, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
 
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     Log.i("Test", "Count down finished!");
-                    buttonGo.setEnabled(true);
+                    timerReset();
                 }
             }.start();
         } else {
@@ -119,7 +120,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void functionButtonStop(View view) {
+        timerReset();
+    }
+
+    public void timerReset(){
         buttonGo.setEnabled(true);
+        //buttonGo.setVisibility(View.VISIBLE);
+        //buttonStop.setVisibility(View.INVISIBLE);
         count = 0;
         seekBarTimer.setProgress(count);
         textTime.setText("0:00");
