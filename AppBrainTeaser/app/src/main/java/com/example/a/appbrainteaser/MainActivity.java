@@ -17,12 +17,12 @@ public class MainActivity extends AppCompatActivity {
     TextView textAnswer;
     TextView textTasks;
     Button buttonStart;
-    int timer;
     int answer;
     int answerGiven;
     int tasks;
     int wrongTasks;
     int rightTasks;
+    boolean started;
     CountDownTimer countDownTimer;
 
     @Override
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         textAnswer = (TextView) findViewById(R.id.textAnswer);
         textTasks = (TextView) findViewById(R.id.textTasks);
         buttonStart = (Button) findViewById(R.id.buttonStart);
+        started = false;
 
         reset();
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Test", " start click");
         buttonStart.setVisibility(View.INVISIBLE);
         reset();
+        started = true;
         functionWork();
     }
 
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.i("Test", "tik " + millisUntilFinished / 1000);
-                textCounter.setText("" + millisUntilFinished / 1000);
+                textCounter.setText("" + millisUntilFinished / 1000 + "s");
             }
 
             @Override
@@ -86,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
         countDownTimer.cancel();
         functionEquation();
         functionCounter();
-        textTasks.setText("" + (rightTasks + wrongTasks));
-        textResults.setText(rightTasks + "/" + tasks);
+        functionResult();
     }
 
     public void functionEquation() {
@@ -97,10 +98,6 @@ public class MainActivity extends AppCompatActivity {
         answer = randomNumber1 + randomNumber2;
         textEquation.setText("" + randomNumber1 + " + " + randomNumber2);
         textAnswer.setText("" + answer);
-        //text1.setText("" + answer);
-        // text2.setText("" + randomNumbers(50));
-        //text3.setText("" + randomNumbers(50));
-        // text4.setText("" + randomNumbers(50));
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout);
         TextView temp;
         for (int i = 0; i < 4; i++) {
@@ -111,30 +108,31 @@ public class MainActivity extends AppCompatActivity {
                 temp.setText("" + randomNumbers(50));
             }
         }
-
     }
 
     public void functionResult() {
-        textResults.setText(rightTasks + "/" + tasks);
+        textTasks.setText((rightTasks + wrongTasks) + "/" + tasks);
+        textResults.setText(rightTasks + "/" + (rightTasks + wrongTasks));
     }
 
     public void functionGetAnswer(View view) {
-        TextView textView = (TextView) findViewById(view.getId());
-        answerGiven = Integer.parseInt(textView.getText().toString());
-        if (answer == answerGiven) {
-            rightTasks++;
-        } else {
-            wrongTasks++;
+        if (started) {
+            TextView textView = (TextView) findViewById(view.getId());
+            answerGiven = Integer.parseInt(textView.getText().toString());
+            if (answer == answerGiven) {
+                rightTasks++;
+            } else {
+                wrongTasks++;
+            }
+            if (tasks - (wrongTasks + rightTasks) >= 0) {
+                functionWork();
+            } else {
+                countDownTimer.cancel();
+                started = false;
+                buttonStart.setVisibility(View.VISIBLE);
+            }
+            Log.i("Test", "answer clicked - " + answerGiven);
         }
-        if (tasks - (wrongTasks + rightTasks) >= 0) {
-            functionWork();
-        } else {
-            countDownTimer.cancel();
-            buttonStart.setVisibility(View.VISIBLE);
-        }
-
-
-        Log.i("Test", "answer clicked - " + answerGiven);
     }
 
     public int randomNumber(int topRandom) {
