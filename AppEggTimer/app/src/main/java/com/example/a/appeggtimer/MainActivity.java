@@ -1,5 +1,6 @@
 package com.example.a.appeggtimer;
 
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button buttonGo;
     Button buttonPause;
     Button buttonStop;
+    MediaPlayer mediaPlayer;
     SeekBar seekBarTimer;
     CountDownTimer countDown;
     int count = 0;
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             isCanceled = false;
 
             //+100 to fix light lag on start end
-            countDown = new CountDownTimer(count * 1000+100, 1000) {
+            countDown = new CountDownTimer(count * 1000 + 100, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
 
@@ -106,6 +108,16 @@ public class MainActivity extends AppCompatActivity {
                 public void onFinish() {
                     Log.i("Test", "Count down finished!");
                     timerReset();
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.horn);
+                    mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mediaPlayer.reset();
+                            mediaPlayer.release();
+                            mediaPlayer = null;
+                        }
+                    });
                 }
             }.start();
         } else {
@@ -123,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         timerReset();
     }
 
-    public void timerReset(){
+    public void timerReset() {
         buttonGo.setEnabled(true);
         //buttonGo.setVisibility(View.VISIBLE);
         //buttonStop.setVisibility(View.INVISIBLE);
