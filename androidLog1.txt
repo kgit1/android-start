@@ -93,3 +93,10 @@ public void clickFunction(View view){
         Log.i("Password",stringEnterPassword.getText().toString());
     }
 
+
+============JAVADOC UNDER CURSOR=====================================
+Android Studio does not displayed Javadoc by default when an element is being hovered, which is a burden for productivity. However, this can be easily set up:
+
+Go to Preferences and then Editor. When the window appears, mark the last option
+===========================================
+

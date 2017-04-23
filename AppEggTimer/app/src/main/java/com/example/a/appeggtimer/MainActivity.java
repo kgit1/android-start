@@ -126,5 +126,12 @@ public class MainActivity extends AppCompatActivity {
         isCanceled = true;
     }
 
+    /*seekBar.setOnTouchListener(new OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            return blockSeekbar;
+        }
+    });*/
+
 }
 
