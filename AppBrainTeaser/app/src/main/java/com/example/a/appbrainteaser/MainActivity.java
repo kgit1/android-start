@@ -7,10 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+//style for fullscreen at the bottom
 public class MainActivity extends AppCompatActivity {
 
+    RelativeLayout rLayout;
     TextView textCounter;
     TextView textEquation;
     TextView textResults;
@@ -29,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        rLayout =(RelativeLayout)findViewById(R.id.relativeLayout);
+        rLayout.setVisibility(View.INVISIBLE);
 
         textCounter = (TextView) findViewById(R.id.textCounter);
         textEquation = (TextView) findViewById(R.id.textEquation);
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public void functionButtonStart(View view) {
         Log.i("Test", " start click");
         buttonStart.setVisibility(View.INVISIBLE);
+        rLayout.setVisibility(View.VISIBLE);
         reset();
         started = true;
         functionWork();
@@ -153,3 +160,43 @@ public class MainActivity extends AppCompatActivity {
         rightTasks = 0;
     }
 }
+
+/*
+Update Answer I added android:windowIsTranslucent in case you have white screen in start of activity
+
+just create new Style in values/styles.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <!-- to hide white screen in start of window -->
+    <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+</resources>
+from your AndroidManifest.xml add style to your activity
+
+android:theme="@style/AppTheme"*/
+//===========  OR  =========================================================
+
+/*Just add the following attribute to your current theme:
+
+<item name="android:windowFullscreen">true</item>
+For example:
+
+<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/orange</item>
+    <item name="colorPrimaryDark">@android:color/holo_orange_dark</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowFullscreen">true</item>
+</style>*/
+//===========  OR  =========================================================
+
+/*In onCreate call
+
+requestWindowFeature(Window.FEATURE_NO_TITLE); // for hiding title
+
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
