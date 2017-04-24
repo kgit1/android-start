@@ -92,11 +92,255 @@ public void clickFunction(View view){
         Log.i("Name", stringEnterName.getText().toString());
         Log.i("Password",stringEnterPassword.getText().toString());
     }
-
+==================================================================
 
 ============JAVADOC UNDER CURSOR=====================================
-Android Studio does not displayed Javadoc by default when an element is being hovered, which is a burden for productivity. However, this can be easily set up:
+	Android Studio does not displayed Javadoc by default when an element is being hovered, 	which is a burden for productivity. However, this can be easily set up:
 
-Go to Preferences and then Editor. When the window appears, mark the last option
-===========================================
+	Go to Preferences and then Editor. When the window appears, mark the last option
+==================================================================
+
+
+============DOWNLOAD FROM WEB=====================================
+add to AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET"/>
+
+to be like
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.a.appdownloadfromweb">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+than to handle downloading on side thread, not on main which handles our app ui
+create class DownloadTask which extends AsyncTask class with generic params <String,Void,String>
+where first - String - data which class constructor will take
+      second - Void - name of the method which can show progress of this task
+      third - String - variable which will return results of work of DownloadTask class
+
+when we extends AsyncTask class it implements overrided method doInBackground
+which takes String and returns String as we desided here -> AsynkTask<String,Void,String>
+so it look like
+protected String doInBackground(String... params) {}
+
+when we create object of class DownloadTask
+and call execute method -> doInBackground() method will be called
+and call of get() method after execute method - will make this construction to return result value
+so
+DownloadTask task = new DownloadTask();
+String result = task.execute("some string").get();
+so on execute().get() - method doInBackground will be called and return result of his work
+
+next example of apps MainActivite class where DownloadTask class processes string with url adress
+and returns data(html code of page found on urls location)
+
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+
+//add in AndroidManifest.xml to provide internet use permission
+// <uses-permission android:name="android.permission.INTERNET"/>
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
+public class MainActivity extends AppCompatActivity {
+
+    //AsyncTask allows to run another task behind(in new background thread) MainActivity thread
+    // which displays app to user
+    // in AsyncTask<?,?,?>
+    //first (String) - variable which we send to DownloadTask class to instruct it what to do
+    //second - name of method which shows the progress of this task
+    //third - variable which can be returned by DownloadTask class
+    public class DownloadTask extends AsyncTask <String, Void, String>{
+
+        //call execute method from DownloadTask class - will execute this method
+        @Override
+        protected String doInBackground(String... params) {
+
+            String result ="";
+            URL url;
+            HttpURLConnection httpConnection = null;
+
+            for(String param : params){
+                Log.i("Test",param);
+            }
+
+            try{
+
+                //create URL from string
+                url=new URL(params[0]);
+
+                //open HttpURLConnection with URL and openConnection() method
+                httpConnection = (HttpURLConnection)url.openConnection();
+
+                //open inputStream from HttpURLConnection with getInputStream() method
+                 InputStream in = httpConnection.getInputStream();
+                //read stream with InputStreamReader
+                InputStreamReader reader = new InputStreamReader(in);
+
+                int data = reader.read();
+
+                //at the end of content data from stream - will be -1
+                while(data!=-1){
+                    char current = (char)data;
+                    result+=current;
+
+                    data= reader.read();
+                }
+
+                return result;
+            }catch(Exception e){
+                e.printStackTrace();
+
+                return "Failed";
+            }
+            //call get() after execute() method - wil provide returned data
+            //return result;
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        DownloadTask dTask = new DownloadTask();
+        String result="";
+        try {
+            //result = dTask.execute("https://www.ecowebhosting.co.uk/").get();
+            result = new DownloadTask().execute("https://www.ecowebhosting.co.uk/").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        Log.i("Result",result);
+    }
+}
+==================================================================
+
+
+============DOWNLOAD IMAGE FROM WEB===============================
+add to AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET"/>
+
+create nested class DownloadTask extends AsyncTask <String, Void, Bitmap>
+to process url and return image found on the url's location
+
+next example of apps MainActivite class
+
+package com.example.a.appdownloadimagefromweb;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView downloadedImage;
+
+    public void functionButtonDownloadImage(View view){
+
+        //http://orig12.deviantart.net/6492/f/2016/059/3/4/seasonal_feathers_by_nanfe-d9tggn2.jpg
+        Log.i("Test","Button 1 - clicked");
+
+        ImageDownloader task = new ImageDownloader();
+        Bitmap myImage;
+        try {
+            myImage = task.execute("http://orig12.deviantart.net/6492/f/2016/059/3/4/seasonal_feathers_by_nanfe-d9tggn2.jpg").get();
+
+            downloadedImage.setImageBitmap(myImage);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        downloadedImage = (ImageView)findViewById(R.id.image1);
+    }
+
+    public class ImageDownloader extends AsyncTask<String,Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+
+            try {
+                URL url = new URL(params[0]);
+
+                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+
+                //get image in one go and convert to bitmap
+                urlConnection.connect();
+
+                InputStream in = urlConnection.getInputStream();
+
+                Bitmap myBitmap = BitmapFactory.decodeStream(in);
+
+                return myBitmap;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+	
 
