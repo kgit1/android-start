@@ -22,45 +22,45 @@ public class MainActivity extends AppCompatActivity {
     //first (String) - variable which we send to DownloadTask class to instruct it what to do
     //second - name of method which shows the progress of this task
     //third - variable which can be returned by DownloadTask class
-    public class DownloadTask extends AsyncTask <String, Void, String>{
+    public class DownloadTask extends AsyncTask<String, Void, String> {
 
         //call execute method from DownloadTask class - will execute this method
         @Override
         protected String doInBackground(String... params) {
 
-            String result ="";
+            String result = "";
             URL url;
             HttpURLConnection httpConnection = null;
 
-            for(String param : params){
-                Log.i("Test",param);
+            for (String param : params) {
+                Log.i("Test", param);
             }
 
-            try{
+            try {
 
                 //create URL from string
-                url=new URL(params[0]);
+                url = new URL(params[0]);
 
                 //open HttpURLConnection with URL and openConnection() method
-                httpConnection = (HttpURLConnection)url.openConnection();
+                httpConnection = (HttpURLConnection) url.openConnection();
 
                 //open inputStream from HttpURLConnection with getInputStream() method
-                 InputStream in = httpConnection.getInputStream();
+                InputStream in = httpConnection.getInputStream();
                 //read stream with InputStreamReader
                 InputStreamReader reader = new InputStreamReader(in);
 
                 int data = reader.read();
 
                 //at the end of content data from stream - will be -1
-                while(data!=-1){
-                    char current = (char)data;
-                    result+=current;
+                while (data != -1) {
+                    char current = (char) data;
+                    result += current;
 
-                    data= reader.read();
+                    data = reader.read();
                 }
 
                 return result;
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
 
                 return "Failed";
@@ -68,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
             //call get() after execute() method - wil provide returned data
             //return result;
         }
-    };
+    }
+
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         DownloadTask dTask = new DownloadTask();
-        String result="";
+        String result = "";
         try {
             //result = dTask.execute("https://www.ecowebhosting.co.uk/").get();
             result = new DownloadTask().execute("https://www.ecowebhosting.co.uk/").get();
@@ -85,6 +87,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        Log.i("Result",result);
+        Log.i("Result", result);
     }
 }

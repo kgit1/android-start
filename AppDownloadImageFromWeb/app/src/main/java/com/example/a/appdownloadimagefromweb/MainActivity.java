@@ -20,10 +20,10 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView downloadedImage;
 
-    public void functionButtonDownloadImage(View view){
+    public void functionButtonDownloadImage(View view) {
 
         //http://orig12.deviantart.net/6492/f/2016/059/3/4/seasonal_feathers_by_nanfe-d9tggn2.jpg
-        Log.i("Test","Button 1 - clicked");
+        Log.i("Test", "Button 1 - clicked");
 
         ImageDownloader task = new ImageDownloader();
         Bitmap myImage;
@@ -43,17 +43,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        downloadedImage = (ImageView)findViewById(R.id.image1);
+        downloadedImage = (ImageView) findViewById(R.id.image1);
     }
 
-    public class ImageDownloader extends AsyncTask<String,Void, Bitmap> {
+    public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
         @Override
         protected Bitmap doInBackground(String... params) {
 
             try {
                 URL url = new URL(params[0]);
 
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 //get image in one go and convert to bitmap
                 urlConnection.connect();
