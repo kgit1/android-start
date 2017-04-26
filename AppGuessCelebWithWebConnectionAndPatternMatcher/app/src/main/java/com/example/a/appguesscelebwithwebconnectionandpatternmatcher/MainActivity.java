@@ -3,6 +3,7 @@ package com.example.a.appguesscelebwithwebconnectionandpatternmatcher;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,52 +29,59 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> namesArray;
     ArrayList<String> imageURLSArray;
     ImageView image;
-    TextView result;
+    TextView textTimer;
+    TextView textResult;
+    TextView textScore;
+    TextView textGameEnd;
+    Button buttonNewGame;
     GridLayout grid;
     int answerIndex;
     int randomButtonIndex;
 
+    int timerLength;
+    CountDownTimer countDownTimer;
     int tasks;
     int rightTasks;
     int wrongTasks;
 
+
     private ArrayList<String> namesToArray(String htmlCode) {
-        Log.i("Test","Names");
+        Log.i("Test", "Names");
         String[] cutHtml = htmlCode.split("<div class=\"see-more\">");
         ArrayList<String> names = new ArrayList<String>();
-        Pattern pNamesFirst=Pattern.compile("alt=\"Image of "+"(.*?)"+"\" class=\"");
-        Pattern pNamesAfterload = Pattern.compile("alt=\"Image of "+"(.*?)"+"\" title");
+        Pattern pNamesFirst = Pattern.compile("alt=\"Image of " + "(.*?)" + "\" class=\"");
+        Pattern pNamesAfterload = Pattern.compile("alt=\"Image of " + "(.*?)" + "\" title");
 
         Matcher matcher = pNamesFirst.matcher(cutHtml[0]);
-        while(matcher.find()){
+        while (matcher.find()) {
             names.add(matcher.group(1));
         }
 
-        matcher=pNamesAfterload.matcher(cutHtml[0]);
-        while (matcher.find()){
+        matcher = pNamesAfterload.matcher(cutHtml[0]);
+        while (matcher.find()) {
             //matcher.find() second call because pattern occurs twice for every entry
             //so with second call - we every time jump one step ahead before make write
             matcher.find();
             names.add(matcher.group(1));
         }
 
-        Log.i("Test","Names end");
+        Log.i("Test", "Names end");
         return names;
     }
 
-    private ArrayList<String> imageURLsToArray(String htmlCode){
-        Log.i("Test","URLS");
-        String []cutHtml = htmlCode.split("<div class=\"see-more\">");
+    private ArrayList<String> imageURLsToArray(String htmlCode) {
+        Log.i("Test", "URLS");
+        String[] cutHtml = htmlCode.split("<div class=\"see-more\">");
         ArrayList<String> urls = new ArrayList<>();
 
-        Pattern pImageUrls = Pattern.compile("src=\"https://images-na.ssl-images-amazon.com/images/M/"+"(.*?)"+".jpg");
+        Pattern pImageUrls = Pattern.compile("src=\"https://images-na.ssl-images-amazon.com/images/M/" + "(.*?)" + ".jpg");
         Matcher matcher = pImageUrls.matcher(cutHtml[0]);
 
-        while(matcher.find()){
-            urls.add("https://images-na.ssl-images-amazon.com/images/M/"+matcher.group(1)+".jpg");
+        while (matcher.find()) {
+            urls.add("https://images-na.ssl-images-amazon.com/images/M/" + matcher.group(1) + ".jpg");
         }
 
-        Log.i("Test","URLS end");
+        Log.i("Test", "URLS end");
         return urls;
     }
 
@@ -84,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
             try {
-                Log.i("Test","Background");
+                Log.i("Test", "Background");
                 URL url = new URL(params[0]);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = httpURLConnection.getInputStream();
@@ -97,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     result.append(tempChar);
                     data = reader.read();
                 }
-                Log.i("Test","Background - end");
+                Log.i("Test", "Background - end");
                 return result.toString();
 
             } catch (MalformedURLException e) {
@@ -138,66 +146,102 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        namesArray=new ArrayList<>();
-        imageURLSArray=new ArrayList<>();
+        namesArray = new ArrayList<>();
+        imageURLSArray = new ArrayList<>();
         image = (ImageView) findViewById(R.id.imageView);
-        result=(TextView) findViewById(R.id.textResult);
-        grid =(GridLayout) findViewById(R.id.grid);
+        textTimer = (TextView) findViewById(R.id.textTimer);
+        textResult = (TextView) findViewById(R.id.textResult);
+        textScore = (TextView) findViewById(R.id.textScore);
+        textGameEnd = (TextView) findViewById(R.id.textGameEnd);
+        buttonNewGame = (Button) findViewById(R.id.buttonNewGame);
+        grid = (GridLayout) findViewById(R.id.grid);
 
-        tasks=15;
-        rightTasks=0;
-        wrongTasks=0;
 
         try {
             String pageHtml = new DownloadPageHtmlTask().execute("http://www.imdb.com/list/ls052283250/").get();
-            namesArray=namesToArray(pageHtml);
-            imageURLSArray=imageURLsToArray(pageHtml);
+            namesArray = namesToArray(pageHtml);
+            imageURLSArray = imageURLsToArray(pageHtml);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        for(int i = 0; i<namesArray.size();i++) {
+        for (int i = 0; i < namesArray.size(); i++) {
             Log.i("Test", i + " name: " + namesArray.get(i));
         }
-        for(int i = 0; i<imageURLSArray.size();i++) {
+        for (int i = 0; i < imageURLSArray.size(); i++) {
             Log.i("Test", i + " url: " + imageURLSArray.get(i));
         }
 
+        gameStart();
+        game();
+    }
+
+    public void game() {
         draw();
+        functionCounter(timerLength);
+
+        textResult.setText((rightTasks + wrongTasks) + "/" + tasks);
+        textScore.setText(""+rightTasks);
     }
 
-    public void game(){
-       // ImageView image = (ImageView) findViewById(R.id.imageView);
-
-       // GridLayout grid =(GridLayout) findViewById(R.id.grid);
-
-
+    public void gameEnd() {
+        textResult.setText((rightTasks + wrongTasks) + "/" + tasks);
+        textScore.setText(""+rightTasks);
+        textGameEnd.setVisibility(View.VISIBLE);
+        buttonNewGame.setVisibility(View.VISIBLE);
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            grid.getChildAt(i).setEnabled(false);
+        }
+        textGameEnd.setText("Game Ended\n You score\n is: " + rightTasks);
     }
 
-    public void functionAnswer(View view){
+    public void gameStart() {
+        timerLength = 15;
+        tasks = 15;
+        rightTasks = 0;
+        wrongTasks = 0;
+
+        textGameEnd.setVisibility(View.INVISIBLE);
+        buttonNewGame.setVisibility(View.INVISIBLE);
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            grid.getChildAt(i).setEnabled(true);
+        }
+    }
+
+    public void functionAnswer(View view) {
         Button button = (Button) findViewById(view.getId());
-        if(namesArray.get(answerIndex).equals(button.getText())){
+        if (namesArray.get(answerIndex).equals(button.getText())) {
             rightTasks++;
-        }else{
+        } else {
             wrongTasks++;
         }
-        draw();
+        countDownTimer.cancel();
+        if (wrongTasks + rightTasks < tasks) {
+            game();
+        } else {
+            gameEnd();
+        }
     }
 
-    public void draw(){
+    public void functionNewGame(View view){
+        gameStart();
+        game();
+    }
+
+    public void draw() {
         answerIndex = randomNumber(99);
         randomButtonIndex = randomNumber(3);
         //image = (ImageView) findViewById(R.id.imageView);
         try {
             image.setImageBitmap(new DownloadImageTask().execute(imageURLSArray.get(answerIndex)).get());
             Button tempButton;
-            for(int i =0; i<grid.getChildCount();i++){
-                tempButton = (Button)grid.getChildAt(i);
-                if(i==randomButtonIndex){
+            for (int i = 0; i < grid.getChildCount(); i++) {
+                tempButton = (Button) grid.getChildAt(i);
+                if (i == randomButtonIndex) {
                     tempButton.setText(namesArray.get(answerIndex));
-                }else {
+                } else {
                     tempButton.setText(namesArray.get(randomNumber(99)));
                 }
             }
@@ -207,11 +251,39 @@ public class MainActivity extends AppCompatActivity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        result.setText(rightTasks+"/"+tasks);
     }
 
-    public int randomNumber(int randomMax){
-        return (int) (Math.random()*randomMax);
+    public int randomNumber(int randomMax) {
+        return (int) (Math.random() * randomMax);
+    }
+
+    public void functionCounter(int length) {
+        countDownTimer = new CountDownTimer((1000 * length) + 100, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                textTimer.setText(counterText((int) millisUntilFinished/1000));
+            }
+
+            @Override
+            public void onFinish() {
+                if (wrongTasks + rightTasks <= tasks) {
+                    wrongTasks++;
+                    textTimer.setText("00");
+                    game();
+                }
+            }
+        }.start();
+    }
+
+    public String counterText(int time) {
+        String timeString = "";
+        if (time <= 9) {
+            timeString = "0" + time;
+        } else {
+            timeString = "" + time;
+        }
+
+        return timeString;
     }
 }
 
