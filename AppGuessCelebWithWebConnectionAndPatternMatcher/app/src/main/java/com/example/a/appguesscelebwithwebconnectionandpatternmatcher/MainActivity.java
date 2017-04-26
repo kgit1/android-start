@@ -6,6 +6,11 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> namesArray;
     ArrayList<String> imageURLSArray;
+    ImageView image;
+    TextView result;
+    GridLayout grid;
+    int answerIndex;
+    int randomButtonIndex;
+
+    int tasks;
+    int rightTasks;
+    int wrongTasks;
 
     private ArrayList<String> namesToArray(String htmlCode) {
         Log.i("Test","Names");
@@ -126,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
 
         namesArray=new ArrayList<>();
         imageURLSArray=new ArrayList<>();
+        image = (ImageView) findViewById(R.id.imageView);
+        result=(TextView) findViewById(R.id.textResult);
+        grid =(GridLayout) findViewById(R.id.grid);
+
+        tasks=15;
+        rightTasks=0;
+        wrongTasks=0;
 
         try {
             String pageHtml = new DownloadPageHtmlTask().execute("http://www.imdb.com/list/ls052283250/").get();
@@ -144,6 +165,53 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Test", i + " url: " + imageURLSArray.get(i));
         }
 
+        draw();
+    }
+
+    public void game(){
+       // ImageView image = (ImageView) findViewById(R.id.imageView);
+
+       // GridLayout grid =(GridLayout) findViewById(R.id.grid);
+
+
+    }
+
+    public void functionAnswer(View view){
+        Button button = (Button) findViewById(view.getId());
+        if(namesArray.get(answerIndex).equals(button.getText())){
+            rightTasks++;
+        }else{
+            wrongTasks++;
+        }
+        draw();
+    }
+
+    public void draw(){
+        answerIndex = randomNumber(99);
+        randomButtonIndex = randomNumber(3);
+        //image = (ImageView) findViewById(R.id.imageView);
+        try {
+            image.setImageBitmap(new DownloadImageTask().execute(imageURLSArray.get(answerIndex)).get());
+            Button tempButton;
+            for(int i =0; i<grid.getChildCount();i++){
+                tempButton = (Button)grid.getChildAt(i);
+                if(i==randomButtonIndex){
+                    tempButton.setText(namesArray.get(answerIndex));
+                }else {
+                    tempButton.setText(namesArray.get(randomNumber(99)));
+                }
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        result.setText(rightTasks+"/"+tasks);
+    }
+
+    public int randomNumber(int randomMax){
+        return (int) (Math.random()*randomMax);
     }
 }
 
