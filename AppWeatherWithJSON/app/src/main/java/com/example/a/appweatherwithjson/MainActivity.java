@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new DownloadPageTask().execute("http://samples.openweathermap.org/data/2.5/weather?q=London,uk&appid=aabddda8fca6982bdf6299a97f0f0100");
+        new DownloadPageTask().execute("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=aabddda8fca6982bdf6299a97f0f0100");
         /*DownloadPageTask task = new DownloadPageTask();
         String pageHtml="";
         try {
