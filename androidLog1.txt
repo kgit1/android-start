@@ -327,6 +327,20 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+===============TOAST FROM NON-UI THREAD=========
+//to call Toast from non-UI thread
+    public void errorToast(final String errorString) {
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+            }
+        }, 1000);
+    }
+
 
 
 

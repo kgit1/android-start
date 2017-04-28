@@ -30,6 +30,15 @@ public class MainActivity extends AppCompatActivity {
     EditText editCity;
     TextView textWeather;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        editCity = (EditText) findViewById(R.id.editTextCity);
+        textWeather = (TextView) findViewById(R.id.textViewWeather);
+    }
+
     private class DownloadWeatherTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -103,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //to call Toast from non-UI thread
     public void errorToast(final String errorString) {
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -113,18 +123,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
             }
         }, 1000);
-    }
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        editCity = (EditText) findViewById(R.id.editTextCity);
-        textWeather = (TextView) findViewById(R.id.textViewWeather);
-
-
     }
 
     public void functionGetWeather(View view) {
