@@ -1,6 +1,5 @@
 package com.example.a.appwhatstheweather;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -21,9 +20,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 public class MainActivity extends AppCompatActivity {
     //unsplash.com - free images for background
@@ -79,14 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (result != null) {
                 Log.i("resultString", result);
+                String weatherForTextField = "";
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     String resultWeather = jsonObject.getString("weather");
-                    String resultCoord = jsonObject.getString("coord");
-                    String resultMainInfo = jsonObject.getString("main");
-                    String resultVisibility = jsonObject.getString("visibility");
-                    String resultWind = jsonObject.getString("wind");
-                    String weatherForTextField = "";
 
                     JSONArray jsonArray = new JSONArray(resultWeather);
                     JSONObject tempJSON;
@@ -96,18 +93,27 @@ public class MainActivity extends AppCompatActivity {
                                 + "\nDescription: " + tempJSON.getString("description");
                     }
 
-                    tempJSON = new JSONObject(resultMainInfo);
+                    tempJSON = jsonObject.getJSONObject("main");
                     weatherForTextField += "\nTemp: " + kelvinToCelsius(tempJSON.getString("temp"))
                             + "\nPressure: " + tempJSON.getString("pressure")
                             + "\nHumidity: " + tempJSON.getString("humidity")
                             + "\nTemp_min: " + kelvinToCelsius(tempJSON.getString("temp_min"))
                             + "\nTemp_max: " + kelvinToCelsius(tempJSON.getString("temp_max"));
 
+                    tempJSON= jsonObject.getJSONObject("coord");
+                    weatherForTextField+="\nLon: " + tempJSON.getString("lon")
+                            +"\nLat: "+tempJSON.getString("lat");
+
+
+                    weatherForTextField+="\n"+jsonObject.getString("name");
 
                     textWeather.setText(weatherForTextField);
                 } catch (JSONException e) {
+                    textWeather.setText(noneInfo());
                     e.printStackTrace();
                 }
+            }else{
+                textWeather.setText(noneInfo());
             }
         }
     }
@@ -128,7 +134,13 @@ public class MainActivity extends AppCompatActivity {
     public void functionGetWeather(View view) {
         String city = editCity.getText().toString();
         Log.i("city: ", city);
-
+        //to encode string city name to proper url(to handle spaces in name etc)
+        try {
+            city= URLEncoder.encode(city,"UTF-8");
+            Log.i("city encoded: ", city);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         //to get rid out from screen keyboard (which can block way if proposes variants)
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editCity.getWindowToken(), 0);
@@ -140,6 +152,16 @@ public class MainActivity extends AppCompatActivity {
         float temp = Float.parseFloat(temperature);
         temp = temp - 273.15F;
         return new String("" + Math.round(temp));
+    }
+
+    public String noneInfo(){
+        return "Main: " + "none"
+                + "\nDescription: " + "none"
+                + "\nTemp: " + "none"
+                + "\nPressure: " + "none"
+                + "\nHumidity: " + "none"
+                + "\nTemp_min: " + "none"
+                + "\nTemp_max: " + "none";
     }
 }
 
