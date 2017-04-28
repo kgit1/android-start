@@ -5,8 +5,15 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/wp"
     tools:context="com.example.a.appwhatstheweather.MainActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="484dp"
+        android:layout_height="720dp"
+        app:srcCompat="@drawable/wp"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="5dp" />
 
     <EditText
         android:id="@+id/editTextCity"
@@ -54,4 +61,5 @@
         app:layout_constraintLeft_toRightOf="@+id/editTextCity"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

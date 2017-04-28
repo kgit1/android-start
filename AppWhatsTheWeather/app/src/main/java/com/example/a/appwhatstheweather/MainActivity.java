@@ -87,12 +87,12 @@ public class MainActivity extends AppCompatActivity {
                                 + "\nDescription: " + tempJSON.getString("description");
                     }
 
-                        tempJSON = new JSONObject(resultMainInfo);
-                        weatherForTextField += "\nTemp: " + tempJSON.getString("temp")
-                                + "\nPressure: " + tempJSON.getString("pressure")
-                                + "\nHumidity: " + tempJSON.getString("humidity")
-                                + "\nTemp_min: " + fahrenheitToCelsius(tempJSON.getString("temp_min"))
-                                + "\nTemp_max: " + tempJSON.getString("temp_max");
+                    tempJSON = new JSONObject(resultMainInfo);
+                    weatherForTextField += "\nTemp: " + kelvinToCelsius(tempJSON.getString("temp"))
+                            + "\nPressure: " + tempJSON.getString("pressure")
+                            + "\nHumidity: " + tempJSON.getString("humidity")
+                            + "\nTemp_min: " + kelvinToCelsius(tempJSON.getString("temp_min"))
+                            + "\nTemp_max: " + kelvinToCelsius(tempJSON.getString("temp_max"));
 
 
                     textWeather.setText(weatherForTextField);
@@ -138,10 +138,10 @@ public class MainActivity extends AppCompatActivity {
         new DownloadWeatherTask().execute("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=aabddda8fca6982bdf6299a97f0f0100");
     }
 
-    public String fahrenheitToCelsius(String temperature){
-        double temp = Double.parseDouble(temperature);
-        temp = (temp - 32) * 5 / 9;
-        return new String(""+temp);
+    public String kelvinToCelsius(String temperature) {
+        float temp = Float.parseFloat(temperature);
+        temp = temp - 273.15F;
+        return new String("" + Math.round(temp));
     }
 }
 
