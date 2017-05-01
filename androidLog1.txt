@@ -837,3 +837,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 }
+
+=========FULLSCREEN APP========
+add to styles.xml
+	<item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+
+
+
+
+
