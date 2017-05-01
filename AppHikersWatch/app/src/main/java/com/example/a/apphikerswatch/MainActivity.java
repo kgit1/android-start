@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if(lastKnownLocation!=null) {
+                if (lastKnownLocation != null) {
                     textView.setText(locationData(lastKnownLocation));
                 }
             }
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public String locationData(Location location) {
-        String addressData = "";
+        String addressData = "Could not find address";
 
         if (location != null) {
             addressData += "Latitude: " + location.getLatitude()
@@ -106,24 +106,29 @@ public class MainActivity extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
             try {
                 List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                Address address = addresses.get(0);
-                if (address.getSubThoroughfare() != null) {
-                    addressData += "\nAddress: " + address.getSubThoroughfare();
-                }
-                if (address.getThoroughfare() != null) {
-                    addressData += ",\n" + address.getThoroughfare();
-                }
-                if (address.getLocality() != null) {
-                    addressData += "\n" + address.getLocale();
-                }
-                if (address.getCountryName() != null) {
-                    addressData += "\n" + address.getCountryName();
-                }
-                if (address.getCountryCode() != null) {
-                    addressData += " " + address.getCountryCode();
-                }
-                if (address.getPostalCode() != null) {
-                    addressData += "\n" + address.getPostalCode();
+                if (addresses != null && addresses.get(0) != null) {
+                    Address address = addresses.get(0);
+                    if (address.getSubThoroughfare() != null) {
+                        addressData += "\nAddress: " + address.getSubThoroughfare();
+                    }
+                    if (address.getThoroughfare() != null) {
+                        addressData += ",\n" + address.getThoroughfare();
+                    }
+                    if (address.getLocality() != null) {
+                        addressData += "\n" + address.getLocality();
+                    }
+                    if (address.getSubLocality() != null) {
+                        addressData += "\n" + address.getSubLocality();
+                    }
+                    if (address.getCountryName() != null) {
+                        addressData += "\n" + address.getCountryName();
+                    }
+                    if (address.getCountryCode() != null) {
+                        addressData += " " + address.getCountryCode();
+                    }
+                    if (address.getPostalCode() != null) {
+                        addressData += "\n" + address.getPostalCode();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
