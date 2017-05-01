@@ -1,3 +1,4 @@
+lon77.5602171 lat12.9825313
 download android studio -> instal -> run
 
 start new Android Studio project
@@ -518,15 +519,53 @@ permission in AndroidManifest.xml for location
 
 code for location get - first LocationManager - 
 which take location from  getSystemServiceContext.LOCATION_SERVICE)
+locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
 than - LocationListener which will check users location and give signal on change
+locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.i("addressData: ", location.toString());
+                textView.setText(locationData(location));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
 than - check do we have explicit permission for location from user and ask it if haven't
 
-//if no permission
-if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            //ask for it
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-}
+ //if SDK < 23(Marshmallow) - we don't need permission and can ask location immediately
+if (Build.VERSION.SDK_INT < 23) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 	locationListener);
+        }//if SDK > 23
+        else {
+            //check do we have permission
+            //if haven't - ask
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) 		!= PackageManager.PERMISSION_GRANTED) {
+                //ask permission
+                ActivityCompat.requestPermissions(this, new String[]		{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }//if have - run code to ask location
+            else {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
+                Location lastKnownLocation = locationManager.getLastKnownLocation		(LocationManager.GPS_PROVIDER);
+                if(lastKnownLocation!=null) {
+                    textView.setText(locationData(lastKnownLocation));
+                }
+            }
+        }
 
 than create method which will react on users responce on permission ask
 @Override
@@ -537,14 +576,14 @@ than create method which will react on users responce on permission ask
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             //here we need one more check if we do have permission
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== 		PackageManager.PERMISSION_GRANTED){
             //if we do have permission - call requestLocationUpdates() method for locationManager
                 //which will add listener to it, and give details for listener
-                // LocationManager.GPS_PROVIDER - as location data provider(GPS because we choose ACCESS_FINE_LOCATION
-                // 0 - for min time between ask on location changes - we can put some value to save battery, like to ask only every 10 seconds or more
+                // LocationManager.GPS_PROVIDER - as location data provider(GPS because we choose 		ACCESS_FINE_LOCATION
+                // 0 - for min time between ask on location changes - we can put some value to save 		battery, like to ask only every 10 seconds or more
                 // 0 - for min distance of location change to give signal to method
                 // locationListener
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
             }
         }
     }
@@ -571,7 +610,7 @@ public class MainActivity extends AppCompatActivity {
     LocationListener locationListener;
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull 	int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         Log.i("request", "1");
@@ -581,14 +620,14 @@ public class MainActivity extends AppCompatActivity {
             //here we need one more check if we do have permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Log.i("request", "3");
-                //if we do have permission - call requestLocationUpdates() method for locationManager
+                //if we do have permission - call requestLocationUpdates() method for 		locationManager
                 //which will add listener to it, and give details for listener
-                // LocationManager.GPS_PROVIDER - as location data provider(GPS because we choose ACCESS_FINE_LOCATION
-                // 0 - for min time between ask on location changes - we can put some value to save battery, like to ask only every 10 seconds or more
+                // LocationManager.GPS_PROVIDER - as location data provider(GPS because we choose 		ACCESS_FINE_LOCATION
+                // 0 - for min time between ask on location changes - we can put some value to save 		battery, like to ask only every 10 seconds or more
                 // 0 - for min distance of location change to give signal to method
                 // locationListener
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
             }
         }
     }
@@ -627,7 +666,7 @@ public class MainActivity extends AppCompatActivity {
         //if device running SDK <23(Marshmallow)
         if (Build.VERSION.SDK_INT < 23) {
             Log.i("request", "6");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
         } else {
             //we need to ask user permission for location explicitly
             //first check if we already have permission, call object ContextCompat -
@@ -636,13 +675,13 @@ public class MainActivity extends AppCompatActivity {
             //invoke method checkSelfPermissions() which needs Context and permission name
             // Context - this, permission name - Manifest.permission.ACCESS_FINE_LOCATION
             //if no permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) 		!= PackageManager.PERMISSION_GRANTED) {
                 Log.i("request", "4");
                 //ask for it
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                ActivityCompat.requestPermissions(this, new String[]		{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             } else {
                 Log.i("request", "5");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
             }
         }
     }
@@ -690,11 +729,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double lon;
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull 		int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) 		== PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
             }
         }
     }
@@ -737,7 +776,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 lat = location.getLatitude();
                 lon = location.getLongitude();
                 LatLng userLoc = new LatLng(lat, lon);
-                mMap.addMarker(new MarkerOptions().position(userLoc).title("User-" + lat + ":lon"));
+                mMap.addMarker(new MarkerOptions().position(userLoc).title("User-" + lat + 		":lon"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
 
                 //to transform latitude and longitude to actual address
@@ -747,7 +786,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // transforming a (latitude, longitude) coordinate into a (partial) address.
                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                 try {
-                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), 		location.getLongitude(), 1);
                     if (addresses != null && addresses.size() > 0) {
                         Log.i("Address", addresses.get(0).toString());
                         List<String> address = new ArrayList<>();
@@ -789,7 +828,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         Log.i("forToast", forToast);
 
-                        Toast.makeText(getApplicationContext(), forToast, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), forToast, Toast.LENGTH_LONG).show		();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -812,9 +851,112 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //if SDK < 23(Marshmallow) - we dont need permission and can ask location immediately
         if (Build.VERSION.SDK_INT < 23) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
             //if SDK > 23
         } else {
+            //check do we have permission
+            //if haven't - ask
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) 		!= PackageManager.PERMISSION_GRANTED) {
+                //ask permission
+                ActivityCompat.requestPermissions(this, new String[]		{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }//if have - run code to ask location
+            else {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, 		locationListener);
+
+                //to draw marker on map on start, not only when user moves
+                Location lastKnownLocation = locationManager.getLastKnownLocation		(LocationManager.GPS_PROVIDER);
+
+                Log.i("lastLoc", lastKnownLocation.toString());
+                lat = lastKnownLocation.getLatitude();
+                lon = lastKnownLocation.getLongitude();
+                LatLng userLoc = new LatLng(lat, lon);
+                mMap.addMarker(new MarkerOptions().position(userLoc).title("User-lat:" + lat + 		":lon" + lon));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
+            }
+        }
+    }
+}
+
+
+=========App Hikers Watch
+locationManager+locationListener+lastKnownLocation+geocoder->location by lat and lon to address
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity {
+
+    LocationManager locationManager;
+    LocationListener locationListener;
+    TextView textView;
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Log.i("permission: ", "6");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        //location manager initialize
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        textView = (TextView) findViewById(R.id.textView);
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.i("addressData: ", location.toString());
+                textView.setText(locationData(location));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        //if SDK < 23(Marshmallow) - we don't need permission and can ask location immediately
+        if (Build.VERSION.SDK_INT < 23) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        }//if SDK > 23
+        else {
             //check do we have permission
             //if haven't - ask
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -823,28 +965,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }//if have - run code to ask location
             else {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-                //to draw marker on map on start, not only when user moves
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                Log.i("lastLoc", lastKnownLocation.toString());
-                lat = lastKnownLocation.getLatitude();
-                lon = lastKnownLocation.getLongitude();
-                LatLng userLoc = new LatLng(lat, lon);
-                mMap.addMarker(new MarkerOptions().position(userLoc).title("User-lat:" + lat + ":lon" + lon));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
+                if(lastKnownLocation!=null) {
+                    textView.setText(locationData(lastKnownLocation));
+                }
             }
         }
     }
+
+
+    public String locationData(Location location) {
+        String addressData = "";
+
+        if (location != null) {
+            addressData += "Latitude: " + location.getLatitude()
+                    + "\nLongitude: " + location.getLongitude()
+                    + "\nAccuracy: " + location.getAccuracy()
+                    + "\nAttitude: " + location.getAltitude();
+
+
+            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                Address address = addresses.get(0);
+                if (address.getSubThoroughfare() != null) {
+                    addressData += "\nAddress: " + address.getSubThoroughfare();
+                }
+                if (address.getThoroughfare() != null) {
+                    addressData += ",\n" + address.getThoroughfare();
+                }
+                if (address.getLocality() != null) {
+                    addressData += "\n" + address.getLocale();
+                }
+                if (address.getCountryName() != null) {
+                    addressData += "\n" + address.getCountryName();
+                }
+                if (address.getCountryCode() != null) {
+                    addressData += " " + address.getCountryCode();
+                }
+                if (address.getPostalCode() != null) {
+                    addressData += "\n" + address.getPostalCode();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.i("addressData: ", addressData);
+        return addressData;
+    }
 }
-
-=========FULLSCREEN APP========
-add to styles.xml
-	<item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-
-
-
-
-

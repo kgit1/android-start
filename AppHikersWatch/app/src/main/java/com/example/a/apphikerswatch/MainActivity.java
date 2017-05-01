@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener locationListener;
-    String locationData;
     TextView textView;
 
 
@@ -72,31 +71,25 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        //if SDK < 23(Marshmallow) - we dont need permission and can ask location immediately
+        //if SDK < 23(Marshmallow) - we don't need permission and can ask location immediately
         if (Build.VERSION.SDK_INT < 23) {
-            Log.i("permission: ", "1");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         }//if SDK > 23
         else {
-            Log.i("permission: ", "2");
             //check do we have permission
             //if haven't - ask
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.i("permission: ", "3");
                 //ask permission
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }//if have - run code to ask location
             else {
-                Log.i("permission1: ", locationManager.toString());
-                Log.i("permission1: ", locationListener.toString());
-                Log.i("permission1: ", LocationManager.GPS_PROVIDER);
-                Log.i("permission1: ", "1");
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                textView.setText(locationData(lastKnownLocation));
+                if(lastKnownLocation!=null) {
+                    textView.setText(locationData(lastKnownLocation));
+                }
             }
         }
-        Log.i("permission: ", "4");
     }
 
 
@@ -120,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
                 if (address.getThoroughfare() != null) {
                     addressData += ",\n" + address.getThoroughfare();
                 }
-                /*if (address.getLocale() != null) {
+                if (address.getLocality() != null) {
                     addressData += "\n" + address.getLocale();
-                }*/
+                }
                 if (address.getCountryName() != null) {
                     addressData += "\n" + address.getCountryName();
                 }
