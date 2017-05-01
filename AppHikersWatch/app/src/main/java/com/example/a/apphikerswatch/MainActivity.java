@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
-                Log.i("permission: ","6");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Log.i("permission: ", "6");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             }
         }
     }
@@ -47,12 +47,12 @@ public class MainActivity extends AppCompatActivity {
         //location manager initialize
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        textView=(TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.textView);
 
-        locationListener=new LocationListener() {
+        locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.i("addressData: ",location.toString());
+                Log.i("addressData: ", location.toString());
                 textView.setText(locationData(location));
             }
 
@@ -73,37 +73,37 @@ public class MainActivity extends AppCompatActivity {
         };
 
         //if SDK < 23(Marshmallow) - we dont need permission and can ask location immediately
-        if(Build.VERSION.SDK_INT<23){
-            Log.i("permission: ","1");
+        if (Build.VERSION.SDK_INT < 23) {
+            Log.i("permission: ", "1");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         }//if SDK > 23
         else {
-            Log.i("permission: ","2");
+            Log.i("permission: ", "2");
             //check do we have permission
             //if haven't - ask
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-                Log.i("permission: ","3");
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Log.i("permission: ", "3");
                 //ask permission
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }//if have - run code to ask location
-           else{
-                Log.i("permission1: ",locationManager.toString());
-                Log.i("permission1: ",locationListener.toString());
-                Log.i("permission1: ",LocationManager.GPS_PROVIDER);
-                Log.i("permission1: ","1");
-               locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
-               // Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                //textView.setText(locationData(lastKnownLocation));
+            else {
+                Log.i("permission1: ", locationManager.toString());
+                Log.i("permission1: ", locationListener.toString());
+                Log.i("permission1: ", LocationManager.GPS_PROVIDER);
+                Log.i("permission1: ", "1");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                textView.setText(locationData(lastKnownLocation));
             }
         }
-        Log.i("permission: ","4");
+        Log.i("permission: ", "4");
     }
 
 
-    public String locationData(Location location){
-        String addressData="";
+    public String locationData(Location location) {
+        String addressData = "";
 
-        if(location!=null) {
+        if (location != null) {
             addressData += "Latitude: " + location.getLatitude()
                     + "\nLongitude: " + location.getLongitude()
                     + "\nAccuracy: " + location.getAccuracy()
@@ -115,28 +115,28 @@ public class MainActivity extends AppCompatActivity {
                 List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                 Address address = addresses.get(0);
                 if (address.getSubThoroughfare() != null) {
-                    addressData += "Address: " + address.getSubThoroughfare();
+                    addressData += "\nAddress: " + address.getSubThoroughfare();
                 }
                 if (address.getThoroughfare() != null) {
-                    addressData += ", " + address.getThoroughfare();
+                    addressData += ",\n" + address.getThoroughfare();
                 }
-                if (address.getLocale() != null) {
+                /*if (address.getLocale() != null) {
                     addressData += "\n" + address.getLocale();
-                }
+                }*/
                 if (address.getCountryName() != null) {
                     addressData += "\n" + address.getCountryName();
                 }
-                if(address.getCountryCode()!=null){
-                    addressData += "\n" + address.getCountryCode();
+                if (address.getCountryCode() != null) {
+                    addressData += " " + address.getCountryCode();
                 }
-                if(address.getPostalCode()!=null){
+                if (address.getPostalCode() != null) {
                     addressData += "\n" + address.getPostalCode();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        Log.i("addressData: ",addressData);
+        Log.i("addressData: ", addressData);
         return addressData;
     }
 }
