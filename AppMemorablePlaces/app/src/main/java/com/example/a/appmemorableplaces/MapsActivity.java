@@ -1,7 +1,9 @@
 package com.example.a.appmemorableplaces;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -62,22 +65,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         intent = getIntent();
         int placeNumber = intent.getIntExtra("placeNumber", 0);
+        title = "Your location";
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -109,6 +103,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //invoke dataChange on adapter in another activity
                 MainActivity.arrayAdapter.notifyDataSetChanged();
 
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.google.android.gms.maps.model.LatLng", Context.MODE_PRIVATE);
+                try {
+                    ArrayList<String> latitudes = new ArrayList<String>();
+                    ArrayList<String> longitudes = new ArrayList<String>();
+                    for(LatLng coordinates : MainActivity.placesLocations){
+                        latitudes.add(""+coordinates.latitude);
+                        longitudes.add(""+coordinates.longitude);
+                    }
+
+                    sharedPreferences.edit().putString("placesNames", ObjectSerializer.serialize(MainActivity.placesNames)).apply();
+                    sharedPreferences.edit().putString("latitudes", ObjectSerializer.serialize(latitudes)).apply();
+                    sharedPreferences.edit().putString("longitudes", ObjectSerializer.serialize(longitudes)).apply();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 Log.i("AddressGeo", title);
                 mMap.addMarker(new MarkerOptions().position(latLng).title(title));
 
@@ -116,61 +127,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        if (placeNumber == 0) {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    mapMoveCamera(location, title);
-                }
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mapMoveCamera(location, title);
+            }
 
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
 
-                }
+            }
 
-                @Override
-                public void onProviderEnabled(String provider) {
+            @Override
+            public void onProviderEnabled(String provider) {
 
-                }
+            }
 
-                @Override
-                public void onProviderDisabled(String provider) {
+            @Override
+            public void onProviderDisabled(String provider) {
 
-                }
-            };
+            }
+        };
 
-            if (Build.VERSION.SDK_INT < 23) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        if (Build.VERSION.SDK_INT < 23) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             } else {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
+
+
+            if (placeNumber == 0) {
+                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (lastKnownLocation == null) {
+                    lastKnownLocation = new Location(LocationManager.GPS_PROVIDER);
+                    lastKnownLocation.setLatitude(0);
+                    lastKnownLocation.setLongitude(0);
+                    Log.i("lastLocNull", lastKnownLocation.toString());
+                    mapMoveCamera(lastKnownLocation, "Your location");
                 } else {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     mapMoveCamera(lastKnownLocation, "Your location");
                 }
+            } else {
+                Location location = new Location(LocationManager.GPS_PROVIDER);
+                location.setLatitude(MainActivity.placesLocations.get(placeNumber).latitude);
+                location.setLongitude(MainActivity.placesLocations.get(placeNumber).longitude);
+
+                mapMoveCamera(location, MainActivity.placesNames.get(placeNumber));
             }
-        } else {
-            Location location = new Location(LocationManager.GPS_PROVIDER);
-            location.setLatitude(MainActivity.placesLocations.get(placeNumber).latitude);
-            location.setLongitude(MainActivity.placesLocations.get(placeNumber).longitude);
-
-            mapMoveCamera(location, MainActivity.placesNames.get(placeNumber));
         }
-
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));*/
     }
 
     public void mapMoveCamera(Location location, String title) {
         Log.i("locationDraw", location.toString());
+        Log.i("locationTitle", title);
         LatLng userLoc = new LatLng(location.getLatitude(), location.getLongitude());
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
-        if (!title.equals("You location")) ;
-        {
+        if (!title.equals("Your location")) {
             mMap.addMarker(new MarkerOptions().position(userLoc).title(title));
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, 12));
