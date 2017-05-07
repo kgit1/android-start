@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -38,6 +40,25 @@ public class EditTextActivity extends AppCompatActivity {
         InputFilter[] filterArray = new InputFilter[1];
         filterArray[0] = new InputFilter.LengthFilter(8);
         editEntryView.setFilters(filterArray);*/
+
+        /*//to save note immediately on text change
+        editNote.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                MainActivity.notes.set(noteNumber,""+s);
+                notesWriter();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });*/
     }
 
     @Override
