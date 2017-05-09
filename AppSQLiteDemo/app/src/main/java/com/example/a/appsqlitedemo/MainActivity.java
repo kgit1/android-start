@@ -2,11 +2,13 @@ package com.example.a.appsqlitedemo;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,6 +74,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("SQL", "userID: " + c.getInt(c.getColumnIndexOrThrow("userID")) + " name: " + c.getString(c.getColumnIndexOrThrow("age")) + " age: " + c.getString(c.getColumnIndexOrThrow("name")));
                 c.moveToNext();
             }
+
+
+            //retrieve data from db as ContentValues
+            /*ArrayList<ContentValues> retVal = new ArrayList<ContentValues>();
+            ContentValues map;
+            if(c.moveToFirst()) {
+                do {
+                    map = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(c, map);
+                    retVal.add(map);
+                } while(c.moveToNext());
+            }*/
 
             /*SQLiteDatabase eventsDatabase = this.openOrCreateDatabase("Events", MODE_PRIVATE,null);
             eventsDatabase.execSQL("CREATE TABLE IF NOT EXISTS events (event VARCHAR, year INT(5))");
