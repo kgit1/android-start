@@ -29,13 +29,13 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
 
-    private class DownloadDataTask extends AsyncTask<String,Void,String>{
+    private class DownloadDataTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            String result="";
+            String result = "";
             try {
                 URL url = new URL(params[0]);
-                HttpURLConnection httpURLConnection =(HttpURLConnection) url.openConnection();
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.connect();
                 InputStream inputStream = httpURLConnection.getInputStream();
 
@@ -43,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
 
                 int data = reader.read();
 
-                while(data>-1){
+                while (data > -1) {
 
                     char c = (char) data;
-                    result+=c;
-                    data=reader.read();
+                    result += c;
+                    data = reader.read();
                 }
-                Log.i("Test",result);
+                Log.i("Test", result);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class NewsArrayTask extends AsyncTask<String,Void,ArrayList<String>>{
+    private class NewsArrayTask extends AsyncTask<String, Void, ArrayList<String>> {
 
         @Override
         protected ArrayList<String> doInBackground(String... params) {
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONArray jsonArray = new JSONArray(params[0]);
 
                 Log.i("News", jsonArray.toString());
-                for(int i = 0; i<jsonArray.length();i++){
+                for (int i = 0; i < jsonArray.length(); i++) {
                     newsIndexes.add(jsonArray.get(i).toString());
                 }
             } catch (JSONException e) {
@@ -82,21 +82,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*private class NewsToDatabaseTask extends AsyncTask<ArrayList<String>,Void,String>{
+    private class NewsToDatabaseTask extends AsyncTask<ArrayList<String>, Void, String> {
         @Override
         protected String doInBackground(ArrayList<String>... params) {
 
-            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList",MODE_PRIVATE,null);
+            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList", MODE_PRIVATE, null);
             myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (id INT, title VARCHAR, urlPath VARCHAR)");
 
-            for(int i=0;i<params[0].size();i++){
-                new DownloadDataTask().execute("\"https://hacker-news.firebaseio.com/v0/item/"+params[0].get(i).toString()+".json?print=pretty\"")
+            for (int i = 0; i < params[0].size(); i++) {
+                Log.i("Story - " + i, dataToString("https://hacker-news.firebaseio.com/v0/item/" + params[0].get(i).toString() + ".json?print=pretty"));
             }
 
 
             return null;
         }
-    }*/
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,25 +128,42 @@ public class MainActivity extends AppCompatActivity {
 
         myDatabase.close();*/
 
-        DownloadDataTask dataTask= new DownloadDataTask();
+        DownloadDataTask dataTask = new DownloadDataTask();
         NewsArrayTask newsArrayTask = new NewsArrayTask();
+        NewsToDatabaseTask newsToDatabaseTask= new NewsToDatabaseTask();
+
+        String result= "";
+        ArrayList<String> listNewsIndex = new ArrayList<>();
         try {
-            ArrayList<String> listNewsIndex = new ArrayList<>();
-            listNewsIndex = newsArrayTask.execute(dataTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty").get()).get();
+            result = dataTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty").get();
 
-            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList",MODE_PRIVATE,null);
-            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (id INT, title VARCHAR, urlPath VARCHAR)");
+            listNewsIndex = newsArrayTask.execute(result).get();
 
-           // Log.i("Story",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
-            for(int i=0;i<listNewsIndex.size();i++){
-                Log.i("Story - "+i,new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/"+listNewsIndex.get(i).toString()+".json?print=pretty").get());
-              //  Log.i("Story1",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
-            }
+            newsToDatabaseTask.execute(listNewsIndex);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
+        /*try {
+            ArrayList<String> listNewsIndex = new ArrayList<>();
+            listNewsIndex = newsArrayTask.execute(dataTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty").get()).get();
+
+            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList", MODE_PRIVATE, null);
+            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (id INT, title VARCHAR, urlPath VARCHAR)");
+
+            // Log.i("Story",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
+            for (int i = 0; i < listNewsIndex.size(); i++) {
+                Log.i("Story - " + i, new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/" + listNewsIndex.get(i).toString() + ".json?print=pretty").get());
+                //  Log.i("Story1",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }*/
+
         /*Intent intent = new Intent(getApplicationContext(),WebActivity.class);
 
 
@@ -163,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         //topstories
 
 
-
         //story
         //dataTask.execute("https://hacker-news.firebaseio.com/v0/item/14309756.json?print=pretty");
         //story url
@@ -171,8 +187,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void functionButtonWeb(View view){
+    public void functionButtonWeb(View view) {
         Intent intent = new Intent(getApplicationContext(), WebActivity.class);
         startActivity(intent);
+    }
+
+    private String dataToString(String urlPath) {
+        String result = "";
+        try {
+            URL url = new URL(urlPath);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+            InputStream inputStream = httpURLConnection.getInputStream();
+
+            InputStreamReader reader = new InputStreamReader(inputStream);
+
+            int data = reader.read();
+
+            while (data > -1) {
+
+                char c = (char) data;
+                result += c;
+                data = reader.read();
+            }
+            Log.i("Test", result);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
