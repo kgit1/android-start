@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
             //different from the way it used for rowid column.
             //myDatabase.execSQL("CREATE TABLE IF NOT EXISTS users (userID INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR, age INT(3))");
 
+            //The WITHOUT ROWID optimization is likely to be helpful for tables that have
+            //non-integer or composite (multi-column) PRIMARY KEYs and that do not store large
+            //strings or BLOBs.
             //myDatabase.execSQL("CREATE TABLE IF NOT EXISTS users (userID INT PRIMARY, name VARCHAR, age INT(3)) WITHOUT ROWID");
             //A WITHOUT ROWID table is a table that uses a Clustered Index as the primary key.
             //To create a WITHOUT ROWID table, simply add the keywords "WITHOUT ROWID" to
