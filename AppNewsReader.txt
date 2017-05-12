@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
     //get data through buffer line by line
     private String htmlDataFromUrl(String urlPath) {
+	//use commons-io String html = IOUtils.toString(url.openStream(), "utf-8"); ??
         StringBuilder result=new StringBuilder();
         URL url;
         HttpURLConnection httpURLConnection;
