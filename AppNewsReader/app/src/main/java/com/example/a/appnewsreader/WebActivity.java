@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import static com.example.a.appnewsreader.MainActivity.articlesDB;
+
 public class WebActivity extends AppCompatActivity {
 
     @Override
@@ -19,9 +21,10 @@ public class WebActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new WebViewClient());
 
-       webView.loadUrl("https://devblogs.nvidia.com/parallelforall/inside-volta/");
+        //webView.loadUrl("https://devblogs.nvidia.com/parallelforall/inside-volta/");
 
-       // Intent intent = getIntent();
-        //webView.loadData(intent.getStringExtra("data"),"text/html","UTF-8");
+        Intent intent = getIntent();
+        String content = intent.getStringExtra("content");
+        webView.loadData(content, "text/html", "UTF-8");
     }
 }

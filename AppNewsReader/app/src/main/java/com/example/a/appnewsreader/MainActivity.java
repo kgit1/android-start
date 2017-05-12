@@ -3,13 +3,15 @@ package com.example.a.appnewsreader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,195 +24,153 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
+    ArrayList<String> titles = new ArrayList<>();
+    ArrayList<String> contents = new ArrayList<>();
+    ArrayAdapter arrayAdapter;
 
-    private class DownloadDataTask extends AsyncTask<String, Void, String> {
+    static SQLiteDatabase articlesDB;
+
+    private class AllWorkTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            String result = "";
+
+            //get news indexes
+            String result = dataFromUrl(params[0]);
+
+            //get news by index
+            JSONArray jsonArray;
             try {
-                URL url = new URL(params[0]);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.connect();
-                InputStream inputStream = httpURLConnection.getInputStream();
+                jsonArray = new JSONArray(result);
 
-                InputStreamReader reader = new InputStreamReader(inputStream);
-
-                int data = reader.read();
-
-                while (data > -1) {
-
-                    char c = (char) data;
-                    result += c;
-                    data = reader.read();
+                int numberOfResults = 20;
+                if (jsonArray.length() < 20) {
+                    numberOfResults = jsonArray.length();
                 }
-                Log.i("Test", result);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return result;
-        }
-    }
 
-    private class NewsArrayTask extends AsyncTask<String, Void, ArrayList<String>> {
+                //clear DB
+                articlesDB.execSQL("DELETE FROM articles");
 
-        @Override
-        protected ArrayList<String> doInBackground(String... params) {
-            ArrayList<String> newsIndexes = new ArrayList<>();
-            try {
-                JSONArray jsonArray = new JSONArray(params[0]);
+                //get data from news - title, by and url -> get content by url -> put all to DB
+                for (int i = 0; i < numberOfResults; i++) {
+                    String articleId = jsonArray.getString(i);
+                    String data = dataFromUrl("https://hacker-news.firebaseio.com/v0/item/" + articleId + ".json?print=pretty");
+                    JSONObject jsonObject = new JSONObject(data);
 
-                Log.i("News", jsonArray.toString());
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    newsIndexes.add(jsonArray.get(i).toString());
+                    String by = "";
+                    String articleTitle = "";
+                    String articleUrl = "";
+
+                    if (!jsonObject.isNull("title") && !jsonObject.isNull("url")) {
+                        articleTitle = jsonObject.getString("title");
+                        articleUrl = jsonObject.getString("url");
+                        if (!jsonObject.isNull("by")) {
+                            by = jsonObject.getString("by");
+                        }
+                        String articleContent = dataFromUrl(articleUrl);
+
+                        String sql = "INSERT INTO articles (articleId, title, content) VALUES(?,?,?)";
+
+                        SQLiteStatement statement = articlesDB.compileStatement(sql);
+
+                        statement.bindString(1, articleId);
+                        statement.bindString(2, articleTitle);
+                        statement.bindString(3, articleContent);
+
+                        statement.execute();
+                    }
+
+                    Log.i("Story", "Title: " + articleTitle + " - by " + by);
+                    Log.i("URL", articleUrl);
+                    Log.i("DONE", "task: " + i);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException e1) {
+                e1.printStackTrace();
             }
-            /*Log.i("Array",newsIndexes.toString());
-            for(int i=0;i<newsIndexes.size();i++){
-                Log.i("index","i"+i+" "+newsIndexes.get(i));
-            }*/
-            return newsIndexes;
-        }
-    }
-
-    private class NewsToDatabaseTask extends AsyncTask<ArrayList<String>, Void, String> {
-        @Override
-        protected String doInBackground(ArrayList<String>... params) {
-
-            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList", MODE_PRIVATE, null);
-            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (id INT, title VARCHAR, urlPath VARCHAR)");
-
-            for (int i = 0; i < params[0].size(); i++) {
-                Log.i("Story - " + i, dataToString("https://hacker-news.firebaseio.com/v0/item/" + params[0].get(i).toString() + ".json?print=pretty"));
-            }
-
-
             return null;
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            updateListView();
+        }
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       /* SQLiteDatabase myDatabase = this.openOrCreateDatabase("News", MODE_PRIVATE, null);
+        ListView listView = (ListView) findViewById(R.id.listWiew);
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, titles);
+        listView.setAdapter(arrayAdapter);
 
-        myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (newsId INT, title VARCHAR, urlPath VARCHAR)");
+        articlesDB = this.openOrCreateDatabase("articles", MODE_PRIVATE, null);
 
-        myDatabase.execSQL("INSERT INTO news(newsId, title, urlPath) VALUES(14309756,'Inside Volta', 'https://devblogs.nvidia.com/parallelforall/inside-volta/')");
+        articlesDB.execSQL("CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY, articleID INT, title VARCHAR, content VARCHAR)");
 
-        Cursor c = myDatabase.rawQuery("SELECT * FROM news", null);
-        Log.i("SQL columns", String.valueOf(c.getColumnCount()));
-        Log.i("SQL column names", Arrays.toString(c.getColumnNames()));
-        Log.i("SQL id index", String.valueOf(c.getColumnIndexOrThrow("newsId")));
-        Log.i("SQL title index", String.valueOf(c.getColumnIndexOrThrow("title")));
-        Log.i("SQL url index", String.valueOf(c.getColumnIndexOrThrow("urlPath")));
+        updateListView();
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), WebActivity.class);
+                intent.putExtra("content", contents.get(position));
+
+                startActivity(intent);
+            }
+        });
+
+        //AllWorkTask work = new AllWorkTask();
+        //work.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty");
+
+
+    }
+
+    private void updateListView() {
+        Cursor c = articlesDB.rawQuery("SELECT * FROM articles", null);
+
+        int contentIndex = c.getColumnIndex("content");
+        int titleIndex = c.getColumnIndex("title");
 
         c.moveToFirst();
+        if (!c.isAfterLast()) {
+            titles.clear();
+            contents.clear();
 
-        while(!c.isAfterLast()){
-            Log.i("ID",String.valueOf(c.getInt(c.getColumnIndexOrThrow("newsId"))));
-            Log.i("Title",c.getString(c.getColumnIndexOrThrow("title")));
-            Log.i("Url",c.getString(c.getColumnIndexOrThrow("urlPath")));
-            c.moveToNext();
+            do {
+                titles.add(c.getString(titleIndex));
+                contents.add(c.getString(contentIndex));
+            } while (c.moveToNext());
+
+            arrayAdapter.notifyDataSetChanged();
         }
-
-        myDatabase.close();*/
-
-        DownloadDataTask dataTask = new DownloadDataTask();
-        NewsArrayTask newsArrayTask = new NewsArrayTask();
-        NewsToDatabaseTask newsToDatabaseTask= new NewsToDatabaseTask();
-
-        String result= "";
-        ArrayList<String> listNewsIndex = new ArrayList<>();
-        try {
-            result = dataTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty").get();
-
-            listNewsIndex = newsArrayTask.execute(result).get();
-
-            newsToDatabaseTask.execute(listNewsIndex);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        /*try {
-            ArrayList<String> listNewsIndex = new ArrayList<>();
-            listNewsIndex = newsArrayTask.execute(dataTask.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty").get()).get();
-
-            SQLiteDatabase myDatabase = getApplicationContext().openOrCreateDatabase("newsList", MODE_PRIVATE, null);
-            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS news (id INT, title VARCHAR, urlPath VARCHAR)");
-
-            // Log.i("Story",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
-            for (int i = 0; i < listNewsIndex.size(); i++) {
-                Log.i("Story - " + i, new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/" + listNewsIndex.get(i).toString() + ".json?print=pretty").get());
-                //  Log.i("Story1",new DownloadDataTask().execute("https://hacker-news.firebaseio.com/v0/item/14296252.json?print=pretty").get());
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }*/
-
-        /*Intent intent = new Intent(getApplicationContext(),WebActivity.class);
-
-
-        try {
-            intent.putExtra("data",dataTask.execute("https://devblogs.nvidia.com/parallelforall/inside-volta/").get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }*/
-
-        //https://hacker-news.firebaseio.com/v0/topstories
-        //"https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty"
-        //topstories
-
-
-        //story
-        //dataTask.execute("https://hacker-news.firebaseio.com/v0/item/14309756.json?print=pretty");
-        //story url
-        //dataTask.execute("https://devblogs.nvidia.com/parallelforall/inside-volta/");
-
+        c.close();
     }
 
-    public void functionButtonWeb(View view) {
-        Intent intent = new Intent(getApplicationContext(), WebActivity.class);
-        startActivity(intent);
-    }
-
-    private String dataToString(String urlPath) {
+    private String dataFromUrl(String urlPath) {
         String result = "";
+        URL url;
+        HttpURLConnection httpURLConnection;
+
         try {
-            URL url = new URL(urlPath);
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.connect();
+            url = new URL(urlPath);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = httpURLConnection.getInputStream();
-
             InputStreamReader reader = new InputStreamReader(inputStream);
-
             int data = reader.read();
 
-            while (data > -1) {
-
-                char c = (char) data;
-                result += c;
+            while (data != -1) {
+                char current = (char) data;
+                result += current;
                 data = reader.read();
             }
-            Log.i("Test", result);
+            Log.i("URLcontent", result);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
