@@ -5,12 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,7 +17,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,12 +25,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class Working1Activity extends AppCompatActivity {
 
     ArrayList<String> titles = new ArrayList<>();
     ArrayList<String> contents = new ArrayList<>();
     ArrayAdapter arrayAdapter;
-    boolean refresh= false;
 
     static SQLiteDatabase articlesDB;
 
@@ -42,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            refresh=false;
             //get news indexes
             String result = dataFromUrl(params[0]);
 
@@ -75,9 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         if (!jsonObject.isNull("by")) {
                             by = jsonObject.getString("by");
                         }
-                        String articleContent = htmlDataFromUrl(articleUrl);
-                        //Log.i("TEST","content");
-                        //Log.i("HTML",articleContent);
+                        String articleContent = dataFromUrl(articleUrl);
 
                         String sql = "INSERT INTO articles (articleId, title, content) VALUES(?,?,?)";
 
@@ -89,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                         statement.execute();
                     }
+
                     Log.i("Story", "Title: " + articleTitle + " - by " + by);
                     Log.i("URL", articleUrl);
                     Log.i("DONE", "task: " + i);
@@ -132,21 +125,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.list_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+        //AllWorkTask work = new AllWorkTask();
+        //work.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty");
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        AllWorkTask work = new AllWorkTask();
-        work.execute("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty");
-        return true;
 
     }
 
@@ -171,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         c.close();
     }
 
-    //get data char by char
     private String dataFromUrl(String urlPath) {
         String result = "";
         URL url;
@@ -189,48 +170,12 @@ public class MainActivity extends AppCompatActivity {
                 result += current;
                 data = reader.read();
             }
+            Log.i("URLcontent", result);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return result;
-    }
-
-    //get data through buffer line by line
-    private String htmlDataFromUrl(String urlPath) {
-        StringBuilder result=new StringBuilder();
-        URL url;
-        HttpURLConnection httpURLConnection;
-        BufferedReader bufferedReader = null;
-
-        try {
-            url = new URL(urlPath);
-            httpURLConnection = (HttpURLConnection) url.openConnection();
-            InputStream inputStream = httpURLConnection.getInputStream();
-            InputStreamReader reader = new InputStreamReader(inputStream);
-            bufferedReader = new BufferedReader(reader);
-
-            String line = null;
-
-            while ((line = bufferedReader.readLine())!=null) {
-                result.append(line+"\n");
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally{
-            if(bufferedReader!=null){
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        //Log.i("Test","html method");
-        //Log.i("HTML method", result.toString());
-        return result.toString();
     }
 }
