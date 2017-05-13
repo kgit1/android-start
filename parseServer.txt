@@ -1,0 +1,3 @@
+go to aws.amazon.com
+
+sign in to the console
