@@ -2609,6 +2609,25 @@ public class WebActivity extends AppCompatActivity {
 }
 
 
+////////////////PARSE SERVER ON AWS -AMAZON WEB SERVICE///
+//////////////////////////////////////////////////////////
 
+go to aws.amazon.com
+
+sign in to the console   
+
+All services ->
+EC2 (ElasticCompute - where elastic means that it will be streched automaticaly depends on your need) ->
+Launch Instance ->
+AWS Marketplace ->
+Search Parse, Select Parse Server powered by Bitnami ->  
+Continue ->
+Choose t2.micro ->
+Rewiev and launch ->
+Launch ->  
+select Create new key pair ->
+key pair name instagramandroid ->
+Download key pair -> 
+Launche instance ->  
 
 
