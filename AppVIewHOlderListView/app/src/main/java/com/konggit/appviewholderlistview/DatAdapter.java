@@ -17,7 +17,7 @@ public class DatAdapter extends BaseAdapter {
         this.data = data;
     }
 
-    static class ViewHolder{
+    static class ViewHolder {
 
         TextView textItem;
 
@@ -45,9 +45,9 @@ public class DatAdapter extends BaseAdapter {
 
         ViewHolder viewHolder;
 
-        if(convertView == null){
+        if (convertView == null) {
 
-            LayoutInflater inflater =(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             convertView = inflater.inflate(R.layout.list_item, parent, false);
             viewHolder = new ViewHolder();
@@ -58,14 +58,14 @@ public class DatAdapter extends BaseAdapter {
             //save link to viewHolder in view
             convertView.setTag(viewHolder);
 
-        }else{
+        } else {
 
-            viewHolder=(ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
 
         }
 
         viewHolder.textItem.setText(String.valueOf(getItem(position)));
-        return  convertView;
+        return convertView;
     }
 }
 
