@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         ListView listView2 = (ListView) findViewById(R.id.listView2);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_item, R.id.listItem, getDataSet());
         listView2.setAdapter(arrayAdapter);
+
         //listView.setMinimumHeight(this.getWindowManager().getDefaultDisplay().getMetrics(););
         // When your ListView is connected to an adapter, the adapter will instantiate rows until
         // the ListView has been fully populated with enough items to fill the full height of the list.
